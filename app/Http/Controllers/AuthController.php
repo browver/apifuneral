@@ -8,6 +8,10 @@ use App\Models\User;
 
 class AuthController extends Controller
 {
+    function signup()
+    {
+
+    }
     function login(Request $request)
     {
         $request->validate([
@@ -23,6 +27,15 @@ class AuthController extends Controller
                 'email' => ['The provided credentials are incorrect.'],
             ]);
         }
+
+        $user->tokens()->delete();
+
         return $user->createToken($request->name)->plainTextToken;
+    }
+
+    function logout(Request $request)
+    {
+        $request->user()->tokens()->delete();
+        return response()->json(['message' => 'logout success']);
     }
 }
