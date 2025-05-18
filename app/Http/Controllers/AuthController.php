@@ -8,16 +8,37 @@ use App\Models\User;
 
 class AuthController extends Controller
 {
-    function signup()
+    public function signup(Request $request)
     {
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'fullname' => 'required|string|max:255',
+            'email' => 'required|email|unique:users,email',
+            'password' => 'required|string|min:6|confirmed',
+            'phone' => 'required|string|max:20',
+        ]);
 
+        $user = User::create([
+            'name' => $request -> name,
+            'fullname' => $request -> fullname,            
+            'email' => $request -> email,            
+            'password' => Hash::make($request->password),            
+            'phone' => $request -> phone            
+        ]);
+
+        $token = $user->createToken('auth-token')->plainTextToken;
+        return response()->json([
+            'message' => 'User registered successfully',
+            'access_token' => $token,
+            'token_type' => 'Bearer'
+        ], 201);
     }
+
     function login(Request $request)
     {
         $request->validate([
             'email' => 'required|email',
             'password' => 'required',
-            'name' => 'required'
         ]);
 
         $user = User::where('email', $request->email)->first();
@@ -30,7 +51,11 @@ class AuthController extends Controller
 
         $user->tokens()->delete();
 
-        return $user->createToken($request->name)->plainTextToken;
+        return response()->json([
+        'access_token' => $user->createToken('auth-token')->plainTextToken,
+        'token_type' => 'Bearer'
+]);
+
     }
 
     function logout(Request $request)
