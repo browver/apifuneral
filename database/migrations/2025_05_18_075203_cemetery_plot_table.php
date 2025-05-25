@@ -12,14 +12,16 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('cemetery_models', function (Blueprint $table) {
-            $table->uuid('id')->primary();
+            $table->id();
             $table->string('plot_number', 50)->unique();
-            $table->uuid('class_id');
+            $table->unsignedBigInteger('class_id');
             $table->decimal('area_sqm', 12, 2);
             $table->boolean('is_available')->default(true);
             $table->text('location');
             $table->timestamps();
 
+            //relation
+            $table->foreign('class_id')->references('id')->on('plot_models')->onDelete('cascade');
         });
     }
 

@@ -3,30 +3,28 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Models\CemeteryModel;
+use App\Models\CemeteryPlot;
 
 class CemeteryController extends Controller
 {
-    public function CreateCemetery(Request $request)
-    {
+    // Create Cemetery Plot
+    public function createCemetery(Request $request) {
         $request->validate([
-            'id' => 'required|uuid',
-            'plot_number' => 'required|string|unique:cemetery_models',
-            'class_id' => 'required|uuid',
+            'id' => 'required',
+            'plot_number' => 'required',
+            'class_id' => 'required',
             'area_sqm' => 'required|numeric',
             'is_available' => 'required|boolean',
-            'location' => 'required|string',
+            'location' => 'required',
         ]);
 
-        // Create Cemetery
-
-        $cemetery = CemeteryModel::create([
+        $cemetery = CemeteryPlot::create([
             'id' => $request->id,
             'plot_number' => $request->plot_number,
             'class_id' => $request->class_id,
             'area_sqm' => $request->area_sqm,
             'is_available' => $request->is_available,
-            'location' => $request->location,
+            'location' => $request->location
         ]);
 
         return response([
@@ -36,15 +34,14 @@ class CemeteryController extends Controller
         ]);
     }
 
-    // All Cemeteries
+    // Get all cemetery plots
+    public function getAllCemeteries() {
+        $cemeteries = CemeteryPlot::with('plotClass')->get();
 
-    public function getAllCemeteries()
-    {
-        $cemeteries = CemeteryModel::all();
         if ($cemeteries->isEmpty()) {
             return response([
                 'message' => 'error',
-                'cemeteries' => 'No cemetery data found',
+                'cemeteries' => 'No cemetery plots in database',
                 'status' => 404
             ]);
         }
@@ -56,11 +53,10 @@ class CemeteryController extends Controller
         ]);
     }
 
-    // Single Cemetery
-    public function getCemetery(Request $request)
-    {
-        $request->validate(['id' => 'required|uuid']);
-        $cemetery = CemeteryModel::find($request->id);
+    // Get single cemetery plot
+    public function getCemetery(Request $request) {
+        $request->validate(['id' => 'required']);
+        $cemetery = CemeteryPlot::with('plotClass')->find($request->id);
 
         if ($cemetery) {
             return response([
@@ -71,25 +67,25 @@ class CemeteryController extends Controller
         } else {
             return response([
                 'message' => 'error',
-                'cemetery' => 'Cemetery not found',
+                'cemetery' => 'Cemetery plot not found',
                 'status' => 404
             ]);
         }
     }
 
-    // Update Cemetery
-    public function updateCemetery(Request $request)
-    {
+    // Update cemetery plot
+    public function updateCemetery(Request $request) {
         $request->validate([
-            'id' => 'required|uuid',
-            'plot_number' => 'required|string',
-            'class_id' => 'required|uuid',
+            'id' => 'required',
+            'plot_number' => 'required',
+            'class_id' => 'required',
             'area_sqm' => 'required|numeric',
             'is_available' => 'required|boolean',
-            'location' => 'required|string',
+            'location' => 'required',
         ]);
 
-        $cemetery = CemeteryModel::find($request->id);
+        $cemetery = CemeteryPlot::find($request->id);
+
         if ($cemetery) {
             $cemetery->plot_number = $request->plot_number;
             $cemetery->class_id = $request->class_id;
@@ -99,36 +95,36 @@ class CemeteryController extends Controller
             $cemetery->save();
 
             return response([
-                'message' => 'Cemetery updated successfully',
+                'message' => 'Cemetery plot updated successfully',
                 'cemetery' => $cemetery,
                 'status' => 200
             ]);
         } else {
             return response([
                 'message' => 'error',
-                'cemetery' => 'Cemetery not found',
+                'cemetery' => 'Cemetery plot does not exist',
                 'status' => 404
             ]);
         }
     }
 
-    // Delete Cemetery
-    public function deleteCemetery(Request $request)
-    {
-        $request->validate(['id' => 'required|uuid']);
-        $cemetery = CemeteryModel::find($request->id);
+    // Delete cemetery plot
+    public function deleteCemetery(Request $request) {
+        $request->validate(['id' => 'required']);
+        $cemetery = CemeteryPlot::find($request->id);
 
         if ($cemetery) {
             $cemetery->delete();
+
             return response([
                 'message' => 'success',
-                'cemetery' => 'Cemetery deleted successfully',
+                'cemetery' => 'Cemetery plot deleted successfully',
                 'status' => 200
             ]);
         } else {
             return response([
                 'message' => 'error',
-                'cemetery' => 'Cemetery not found',
+                'cemetery' => 'Cemetery plot does not exist',
                 'status' => 404
             ]);
         }

@@ -4,8 +4,10 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
+use App\Models\PlotModel;
 
-class CemeteryModel extends Model
+
+class CemeteryPlot extends Model
 {
     protected $table = "cemetery_models";
         protected $fillable =[
@@ -23,13 +25,13 @@ class CemeteryModel extends Model
 
         static::creating(function ($model) {
             if (empty($model->id)) {
-                $model->id = (string) Str::uuid();
+                $model->id = (string) Str::id();
             }
         });
     }
 
     public function plotClass()
     {
-        return $this->belongsTo(PlotClass::class, 'class_id');
+        return $this->belongsTo(PlotModel::class, 'class_id');
     }
 }

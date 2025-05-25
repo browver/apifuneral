@@ -25,6 +25,13 @@ class DatabaseSeeder extends Seeder
         
         $this->call([
             UserSeeder::class,
+            PlotModelSeeder::class,
+            ServiceModelSeeder::class,
+            CemeteryPlotSeeder::class,
+            PlotPurchasesSeeder::class,
+            FuneralOrderSeeder::class,
+            MaintenanceModelSeeder::class,
+            MaintenanceOrderSeeder::class,
         ]);
     }
 }
